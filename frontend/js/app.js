@@ -1,3 +1,6 @@
+const API_URL = 'http://localhost:3000'; // Temporal, lo cambiaremos por la URL de Render
+
+// (Aquí siguen tus 'let currentCity = ...', etc.)
 // --- Variables Globales ---
 let currentCity = '';
 let currentChart = null;
@@ -50,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/api/favorites', {
+            const response = await fetch(`${API_URL}/api/favorites`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -136,7 +139,7 @@ function fetchWeather(city, units, lang) {
     document.getElementById('pressure').innerText = '---- MBAR';
     document.getElementById('wind').innerHTML = '---<br><span>---</span>';
 
-    const url = `http://localhost:3000/api/weather?city=${encodeURIComponent(city)}&units=${units}&lang=${lang}`;
+const url = `${API_URL}/api/weather?city=${encodeURIComponent(city)}&units=${units}&lang=${lang}`;
     
     fetch(url)
         .then(response => {
@@ -167,7 +170,7 @@ function fetchWeather(city, units, lang) {
 // --- ¡NUEVA FUNCIÓN PARA CARGAR FAVORITOS! ---
 async function loadFavorites(token) {
     try {
-        const response = await fetch('http://localhost:3000/api/favorites', {
+        const response = await fetch(`${API_URL}/api/favorites`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -314,7 +317,7 @@ async function handleDeleteFavorite(cityName) {
     }
 
     try {
-        const response = await fetch('http://localhost:3000/api/favorites', {
+        const response = await fetch(`${API_URL}/api/favorites`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

@@ -1,3 +1,4 @@
+const API_URL = 'http://localhost:3000';
 document.addEventListener('DOMContentLoaded', async () => {
     const messageEl = document.getElementById('verify-message');
     const loginLink = document.getElementById('login-link');

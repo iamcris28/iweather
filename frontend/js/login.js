@@ -1,4 +1,6 @@
+const API_URL = 'http://localhost:3000';
 // --- FUNCIÓN GLOBAL DE GOOGLE (¡DEBE ESTAR AFUERA!) ---
+
 // Esta es la función 'callback' que Google busca
 async function handleGoogleLogin(response) {
     const messageEl = document.getElementById('auth-message');
@@ -6,12 +8,12 @@ async function handleGoogleLogin(response) {
     messageEl.style.color = 'white';
     
     try {
-        const res = await fetch('http://localhost:3000/api/auth/google', {
+            const response = await fetch(`${API_URL}/api/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ credential: response.credential })
         });
-        const data = await res.json();
+        const data = await response.json();
         if (!res.ok) {
             throw new Error(data.mensaje || 'Error en el login con Google');
         }
@@ -66,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageEl.textContent = '';
 
         try {
-            const response = await fetch('http://localhost:3000/api/register', {
+                const response = await fetch(`${API_URL}/api/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -92,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageEl.textContent = '';
     
         try {
-            const response = await fetch('http://localhost:3000/api/login', {
+                const response = await fetch(`${API_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
