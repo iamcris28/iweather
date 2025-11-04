@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000'; // Temporal, lo cambiaremos por la URL de Render
+const API_URL = 'https://iweather.onrender.com';
 
 // (Aquí siguen tus 'let currentCity = ...', etc.)
 // --- Variables Globales ---

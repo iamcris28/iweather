@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://iweather.onrender.com';
 document.addEventListener('DOMContentLoaded', async () => {
     const messageEl = document.getElementById('verify-message');
     const loginLink = document.getElementById('login-link');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // 2. Enviamos el token a nuestra NUEVA ruta del backend
-        const response = await fetch('http://localhost:3000/api/verify-email', {
+        const response = await fetch(`${API_URL}/api/verify-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

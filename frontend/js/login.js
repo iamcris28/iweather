@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://iweather.onrender.com';
 // --- FUNCIÓN GLOBAL DE GOOGLE (¡DEBE ESTAR AFUERA!) ---
 
 // Esta es la función 'callback' que Google busca
