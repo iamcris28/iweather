@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iWeather - App del Clima</title>
+    <link href="css/main.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <div class="header-bar">
+            <div class="logo">
+                <img src="images/v115_2.png" alt="iWeather Logo">
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="city-input" placeholder="Escribe una ciudad..." />
+                <button id="search-button">Buscar</button>
+                <button id="save-favorite-button" style="display: none;">Guardar ⭐</button>
+            </div>
+
+            <a href="login.html" class="login-link" id="login-link">Login / Registro</a>
+            <button id="logout-button" class="login-link" style="display: none;">Cerrar Sesión</button>
+
+            <div class="favorites-container" id="favorites-container" style="display: none;">
+                <button id="favorites-button" class="login-link">Mis Favoritos (0)</button>
+                <div class="favorites-list" id="favorites-list">
+                    </div>
+            </div>
+
+       
+        </div>
+        
+        <div class="settings-container">
+            <select id="units-select" class="settings-select">
+                <option value="metric">Celsius (°C)</option>
+                <option value="imperial">Fahrenheit (°F)</option>
+            </select>
+            <select id="lang-select" class="settings-select">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+            
+        <div class="weather-card">
+            <h1 id="city-name">Busca una ciudad</h1>
+            <p id="current-description">---</p>
+            <p id="current-temp">--°</p>
+            <p id="min-max-temp">--°/--°</p>
+        </div>
+
+        <div class="info-row">
+
+            <section class="weekly-forecast">
+                <h2>Pronóstico Semanal</h2>
+                <div class="week-cards" id="week-cards-container">
+                    </div>
+            </section>
+
+            <div class="details-card">
+                <h3>Detalles de Hoy</h3>
+                <div class="details-grid">
+                    <div class="detail-box">
+                        <h4>Humedad</h4>
+                        <img src="images/v31_36.png" alt="Humedad">
+                        <p id="humidity">--%</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Presión</h4>
+                        <img src="images/v31_33.png" alt="Presión">
+                        <p id="pressure">---- MBAR</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Viento</h4>
+                        <img src="images/v31_32.png" alt="Viento">
+                        <p id="wind">---<br><span>---</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="map-container">
+            <h2>Mapa de Precipitación</h2>
+            <div id="weather-map"></div>
+        </section>
+
+        <section class="hourly-forecast">
+            <h2>Pronóstico de 24 Horas</h2>
+            <canvas id="hourlyChart"></canvas>
+        </section>
+
+        </div>
+</body>
+</html>

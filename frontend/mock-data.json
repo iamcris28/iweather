@@ -1,0 +1,30 @@
+{
+  "ciudad": "Veracruz, Mex",
+  "descripcion": "Parcialmente Nublado",
+  "temperatura": 29,
+  "min_max": "27°/32°",
+  "humedad": 63,
+  "presion": 1014,
+  "unit": "C",
+  "viento": { "velocidad": "15 km/h", "direccion": "Noreste" },
+  "uv": { "valor": 6.2, "nivel": "Fuerte" },
+  "pronosticoSemanal": [
+    { "dia": "Lunes", "min": 25, "max": 32, "icono": "https://openweathermap.org/img/wn/02d.png", "descripcion": "nubes dispersas" },
+    { "dia": "Martes", "min": 24, "max": 31, "icono": "https://openweathermap.org/img/wn/04d.png", "descripcion": "parcialmente nublado" },
+    { "dia": "Miércoles", "min": 23, "max": 30, "icono": "https://openweathermap.org/img/wn/10d.png", "descripcion": "lluvia ligera" },
+    { "dia": "Jueves", "min": 24, "max": 33, "icono": "https://openweathermap.org/img/wn/01d.png", "descripcion": "soleado" },
+    { "dia": "Viernes", "min": 25, "max": 34, "icono": "https://openweathermap.org/img/wn/03d.png", "descripcion": "nubes dispersas" },
+    { "dia": "Sábado", "min": 24, "max": 32, "icono": "https://openweathermap.org/img/wn/02d.png", "descripcion": "algo nublado" },
+    { "dia": "Domingo", "min": 26, "max": 33, "icono": "https://openweathermap.org/img/wn/01d.png", "descripcion": "soleado" }
+  ],
+  "pronosticoHoras": [
+    { "hora": "00h", "temp": 27 },
+    { "hora": "03h", "temp": 26 },
+    { "hora": "06h", "temp": 25 },
+    { "hora": "09h", "temp": 27 },
+    { "hora": "12h", "temp": 30 },
+    { "hora": "15h", "temp": 31 },
+    { "hora": "18h", "temp": 30 },
+    { "hora": "21h", "temp": 28 }
+  ]
+}

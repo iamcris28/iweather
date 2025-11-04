@@ -1,0 +1,405 @@
+/* --- 1. CONFIGURACIÓN GLOBAL --- */
+/* Importamos la fuente que usabas en tu diseño */
+@import url('https://fonts.googleapis.com/css?family=Istok+Web&display=swap');
+
+* {
+  /* Reseteo básico para que todos los navegadores se comporten igual */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Istok Web', sans-serif;
+  /* Usamos el mismo gradiente de fondo de tu diseño original (.v2_3)
+    Esto asegura que el diseño se sienta familiar.
+  */
+  background: linear-gradient(rgba(14, 175, 239, 1), rgba(10, 52, 119, 1));
+  color: white; /* El color de texto principal será blanco */
+  
+  /* Esto asegura que el gradiente ocupe al menos toda la pantalla */
+  min-height: 100vh; 
+  
+  /* Usamos Flexbox para centrar el contenido principal en la página */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Alinea al inicio verticalmente */
+  padding: 20px; /* Un poco de espacio en los bordes */
+  overflow-y: auto; /* permite desplazarse si el contenido es largo */
+}
+
+/* Creamos un contenedor principal para todo el contenido.
+  Esto nos da control sobre el ancho máximo.
+*/
+.main-container {
+  width: 100%;
+  max-width: 1100px; /* Puedes ajustar este ancho */
+  display: flex;
+  flex-direction: column; /* Apila los elementos (clima, detalles) verticalmente */
+  gap: 30px; /* Espacio entre la sección de clima y la de detalles */
+}
+/* --- CABECERA --- */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo img {
+  height: 35px;
+  width: auto;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/* --- BUSCADOR --- */
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 600px;
+}
+
+#city-input {
+  flex: 1;
+  padding: 12px 18px;
+  font-size: 16px;
+  border-radius: 25px;
+  border: none;
+  min-width: 250px;
+}
+
+#search-button {
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 25px;
+  border: none;
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#search-button:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* --- 2. TARJETA DE CLIMA ACTUAL (.weather-card) --- */
+/* Esta sección contiene la información principal (ciudad, temperatura) */
+.weather-card {
+  /* Usamos Flexbox para organizar el contenido interno */
+  display: flex;
+  flex-direction: column; /* Apila el nombre, temp, y descripción */
+  align-items: center;   /* Los centra horizontalmente */
+  
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9); /* Blanco semi-transparente como en tu CSS */
+  
+  /* Aquí podrías agregar un ícono grande del clima (como tu v21_4.png)
+    Usando un <img> en el HTML y estilizándolo aquí.
+  */
+}
+
+#city-name {
+  font-size: 40px; /* Tamaño similar a tu .v3_15 */
+  font-weight: 700;
+}
+
+#current-description {
+  font-size: 26px; /* Similar a .v3_16 */
+  font-style: italic;
+  margin-top: capitalize;
+}
+
+#current-temp {
+  font-size: 80px; /* Hacemos la temperatura el elemento principal */
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+#min-max-temp {
+  font-size: 22px;
+}
+/* --- SECCIÓN DOBLE (Semanal + Detalles) --- */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Pronóstico Semanal */
+.weekly-forecast {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  backdrop-filter: blur(6px);
+}
+
+.weekly-forecast h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 22px;
+}
+
+.week-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.day-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 10px 15px;
+  transition: background 0.3s ease;
+}
+
+.day-card:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.day-card img {
+  width: 40px;
+  height: 40px;
+}
+
+.details-card {
+  flex: 1;
+  background: rgba(217, 217, 217, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  color: #333;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.detail-box {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.detail-box img {
+  width: 45px;
+  height: auto;
+  margin: 8px 0;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+/* Barra de UV */
+.uv-bar {
+  width: 80%;
+  height: 8px;
+  background: linear-gradient(to right, #00ff00, #ffff00, #ff8000, #ff0000);
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+/* --- GRÁFICO DE 24 HORAS --- */
+.hourly-forecast {
+  margin-top: 30px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.hourly-forecast h2 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+#hourlyChart {
+  width: 100%;
+  max-height: 300px;
+}
+
+/* --- 5. SECCIÓN DE AJUSTES (C°/F° e Idioma) --- */
+.settings-container {
+  display: flex;
+  justify-content: center; /* Centra los selectores */
+  gap: 15px; /* Espacio entre los dos selectores */
+  margin-bottom: 20px; /* Espacio antes de la tarjeta del clima */
+}
+
+.settings-select {
+  /* Le damos un estilo similar al de la barra de búsqueda */
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 20px;
+  border: none;
+  font-family: 'Istok Web', sans-serif;
+
+  /* Estilo para que parezca "flotar" */
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-select:focus {
+  outline: none;
+}
+
+/* Estilo para las opciones del dropdown */
+.settings-select option {
+  color: black; /* Las opciones deben ser legibles */
+  background: white;
+}
+
+/* --- 6. ENLACE A LOGIN --- */
+.login-link {
+  white-space: nowrap;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 20px;
+  transition: background 0.3s ease;
+}
+
+.login-link:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* --- 7. BOTÓN DE GUARDAR FAVORITO --- */
+
+#save-favorite-button {
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 25px;
+  border: none;
+
+  /* Un color dorado para la estrella */
+  background: #FFD700; 
+  color: #333; /* Texto oscuro para que se lea bien */
+
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#save-favorite-button:hover {
+  background: #ffec80; /* Un dorado más claro */
+}
+
+/* --- 7. NUEVO: MAPA DEL CLIMA --- */
+.map-container {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.map-container h2 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+#weather-map {
+  width: 100%;
+  height: 400px; /* Altura del mapa */
+  border-radius: 15px;
+  z-index: 1; /* Importante para que Leaflet funcione bien */
+}
+
+/* --- 8. MENÚ DE FAVORITOS --- */
+.favorites-container {
+  position: relative; /* Contenedor para el menú desplegable */
+}
+
+/* Reutilizamos el estilo del botón de login */
+#favorites-button {
+  width: 160px; /* Un ancho fijo para que se vea bien */
+}
+
+.favorites-list {
+  display: none; /* Oculto por defecto */
+  position: absolute;
+  top: 100%; /* Justo debajo del botón */
+  right: 0;
+  background: rgba(10, 52, 119, 0.9); /* Azul oscuro semi-transparente */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+}
+
+/* Mostramos la lista cuando el contenedor tiene la clase 'open' */
+.favorites-container.open .favorites-list {
+  display: block;
+}
+
+.favorite-item {
+  padding: 12px 15px;
+  color: white;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+}
+
+.favorite-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.favorite-item:last-child {
+  border-bottom: none;
+}
+
+/* --- 9. BOTÓN DE ELIMINAR FAVORITO --- */
+.favorite-item {
+  /* Hacemos que el contenedor sea flexible para alinear el botón */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-fav-btn {
+  background: #ff4d4d; /* Un rojo suave */
+  color: white;
+  border: none;
+  border-radius: 50%; /* Círculo perfecto */
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  line-height: 20px; /* Centra la 'X' verticalmente */
+  text-align: center;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.delete-fav-btn:hover {
+  opacity: 1;
+}

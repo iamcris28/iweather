@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Registro - App del Clima</title>
+    <link href="css/login.css" rel="stylesheet" />
+
+    <script src="js/login.js" defer></script>
+    
+    <script src="https://accounts.google.com/gsi/client" defer></script>
+    
+    <meta name="google-signin-client_id" content="201255838487-u6rmna6ejh1c3nf1l35gbrfim8fso2m8.apps.googleusercontent.com">
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="auth-tabs">
+            <button id="login-tab-btn" class="active">Login</button>
+            <button id="register-tab-btn">Registro</button>
+        </div>
+
+        <div id="auth-message"></div>
+
+        <div id="google-button-container">
+            <div id="g_id_onload"
+                 
+                 data-client_id="201255838487-u6rmna6ejh1c3nf1l35gbrfim8fso2m8.apps.googleusercontent.com"
+                 
+                 data-callback="handleGoogleLogin"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="sign_in_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+        </div>
+
+        <form id="login-form" class="auth-form">
+            <h3>Iniciar Sesión</h3>
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" required>
+            
+            <label for="login-password">Contraseña</label>
+            <input type="password" id="login-password" required>
+            
+            <button type="submit">Entrar</button>
+        </form>
+
+        <form id="register-form" class="auth-form hidden">
+            <h3>Crear Cuenta</h3>
+            <label for="register-email">Email</label>
+            <input type="email" id="register-email" required>
+            
+            <label for="register-password">Contraseña</label>
+            <input type="password" id="register-password" required>
+            
+            <button type="submit">Registrarse</button>
+        </form>
+
+        <a href="index.html" class="back-link">Volver a la App del Clima</a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,17 @@
+# Ignorar todas las carpetas de dependencias
+# Esto le dice a Git que ignore la carpeta 'node_modules' que está DENTRO de 'backend'
+backend/node_modules
+
+# Ignorar también si alguna vez se crea una en la raíz
+node_modules
+
+# ¡MUY IMPORTANTE! Ignorar todos los archivos de secretos
+# Esto le dice a Git que ignore el archivo '.env' que está DENTRO de 'backend'
+backend/.env
+
+# Ignorar también si alguna vez se crea uno en la raíz
+.env
+
+# Ignorar archivos del sistema operativo
+.DS_Store
+Thumbs.db
