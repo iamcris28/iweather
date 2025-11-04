@@ -2,18 +2,24 @@ const API_URL = 'https://iweather.onrender.com';
 // --- FUNCIÓN GLOBAL DE GOOGLE (¡DEBE ESTAR AFUERA!) ---
 
 // Esta es la función 'callback' que Google busca
-async function handleGoogleLogin(response) {
+async function handleGoogleLogin(response) { // <-- 1. El parámetro 'response' de Google
     const messageEl = document.getElementById('auth-message');
     messageEl.textContent = 'Verificando con Google...';
     messageEl.style.color = 'white';
     
     try {
-            const response = await fetch(`${API_URL}/api/auth/google`, {
+        // ¡ARREGLADO! Renombramos la variable a 'res'
+        const res = await fetch(`${API_URL}/api/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ credential: response.credential })
+            // Ahora 'response.credential' usa el parámetro de Google (correcto)
+            body: JSON.stringify({ credential: response.credential }) 
         });
-        const data = await response.json();
+        
+        // ¡ARREGLADO! Usamos 'res.json()'
+        const data = await res.json();
+        
+        // ¡ARREGLADO! Usamos 'res.ok'
         if (!res.ok) {
             throw new Error(data.mensaje || 'Error en el login con Google');
         }
@@ -24,7 +30,8 @@ async function handleGoogleLogin(response) {
         messageEl.textContent = `¡Bienvenido, ${data.email}! Redirigiendo...`;
 
         setTimeout(() => {
-            window.location.href = 'index.html';
+            // ¡ARREGLADO! Usamos la ruta absoluta
+            window.location.href = '/index.html'; 
         }, 1500);
 
     } catch (error) {
