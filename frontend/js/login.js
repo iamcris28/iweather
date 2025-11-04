@@ -31,7 +31,7 @@ async function handleGoogleLogin(response) { // <-- 1. El parámetro 'response' 
 
         setTimeout(() => {
             // ¡ARREGLADO! Usamos la ruta absoluta
-            window.location.href = '/index.html'; 
+            window.location.href = 'index.html'; 
         }, 1500);
 
     } catch (error) {

@@ -125,7 +125,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     unitsSelect.addEventListener('change', handleSettingsChange);
     langSelect.addEventListener('change', handleSettingsChange);
-});
+
+    // (Tu código de 'searchButton', 'cityInput', etc. va aquí arriba)
+    
+    // --- ¡NUEVA LÓGICA DE GEOLOCALIZACIÓN! ---
+    if ('geolocation' in navigator) {
+        // Pedimos la ubicación al usuario
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                // Éxito: El usuario aceptó
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const units = unitsSelect.value;
+                const lang = langSelect.value;
+                
+                // Llamamos a una nueva función para cargar el clima por coordenadas
+                fetchWeatherByCoords(lat, lon, units, lang);
+            },
+            (error) => {
+                // Error: El usuario bloqueó la solicitud o hubo un error
+                console.warn("Geolocalización denegada o fallida.", error.message);
+                // La página simplemente se quedará en "Busca una ciudad",
+                // lo cual está bien.
+            }
+        );
+    } else {
+        console.log("Geolocalización no está disponible en este navegador.");
+    }
+    // --- FIN DE GEOLOCALIZACIÓN ---
+
+}); // <-- FIN DEL DOMContentLoaded
 
 
 // --- LÓGICA DE API ---
@@ -340,3 +369,50 @@ async function handleDeleteFavorite(cityName) {
         alert(`Error: ${error.message}`);
     }
 }
+
+// (Tu función handleDeleteFavorite está aquí arriba...)
+
+// --- ¡NUEVA FUNCIÓN PARA GEOLOCALIZACIÓN! ---
+function fetchWeatherByCoords(lat, lon, units, lang) {
+    
+    // Resetear UI a "Cargando..."
+    document.getElementById('city-name').innerText = 'Buscando tu ubicación...';
+    document.getElementById('current-description').innerText = '---';
+    document.getElementById('current-temp').innerText = '--°';
+    document.getElementById('min-max-temp').innerText = '--°/--°';
+    document.getElementById('humidity').innerText = '--%';
+    document.getElementById('pressure').innerText = '---- MBAR';
+    document.getElementById('wind').innerHTML = '---<br><span>---</span>';
+
+    // ¡Llamamos a la NUEVA RUTA DEL BACKEND!
+    const url = `${API_URL}/api/weather-by-coords?lat=${lat}&lon=${lon}&units=${units}&lang=${lang}`;
+    
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error('Ubicación no encontrada');
+            return response.json();
+        })
+        .then(data => {
+            currentCity = data.ciudad; // Guardamos el nombre de la ciudad
+            
+            // Llamamos a las mismas funciones de actualización
+            updateUI(data); 
+            if (data.pronosticoSemanal) {
+                updateWeeklyForecast(data.pronosticoSemanal);
+            }
+            if (data.pronosticoHoras) {
+                updateHourlyForecast(data.pronosticoHoras);
+            }
+            if (data.coords && data.mapTileUrl) {
+                updateMap(data.coords, data.mapTileUrl);
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar datos por coordenadas:', error);
+            document.getElementById('city-name').innerText = 'Error';
+            document.getElementById('current-description').innerText = 'No se pudo cargar tu ubicación.';
+            currentCity = '';
+        });
+}
+
+// (Tus otras funciones: updateUI, updateWeeklyForecast, etc. siguen aquí)
