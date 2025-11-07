@@ -1,5 +1,5 @@
 // ¡IMPORTANTE! Define la URL de tu backend.
-const API_URL = 'http://localhost:3000'; // Usa tu URL de Render para producción https://iweather.onrender.com
+const API_URL = 'https://iweather.onrender.com'; // Usa tu URL de Render para producción https://iweather.onrender.com
 
 document.addEventListener('DOMContentLoaded', () => {
     const resetForm = document.getElementById('reset-form');

@@ -2,7 +2,7 @@
 // Define la URL de tu backend.
 // Usa 'http://localhost:3000' para tus pruebas locales.
 // Usa 'https://iweather.onrender.com' (tu URL de Render) antes de subir a GitHub.
-const API_URL = 'http://localhost:3000'; 
+const API_URL = 'https://iweather.onrender.com';
 
 document.addEventListener('DOMContentLoaded', () => {
     const forgotForm = document.getElementById('forgot-form');
