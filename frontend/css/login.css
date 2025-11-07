@@ -126,3 +126,19 @@ body {
     justify-content: center; /* Centra el botón */
     margin-bottom: 20px;
 }
+/* --- 9. ENLACE DE OLVIDAR CONTRASEÑA --- */
+.forgot-link {
+  display: block;
+  text-align: right; /* Lo alinea a la derecha */
+  font-size: 14px;
+  color: white;
+  text-decoration: none;
+  margin-top: -5px; /* Lo sube un poco */
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+.forgot-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
