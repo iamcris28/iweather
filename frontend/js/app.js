@@ -154,7 +154,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // --- FIN DE GEOLOCALIZACIÓN ---
 
+    // (Tu código de 'searchButton', 'cityInput', etc. va aquí arriba)
+    
+    // --- ¡NUEVA LÓGICA DE GEOLOCALIZACIÓN! ---
+    if ('geolocation' in navigator) {
+        // Pedimos la ubicación al usuario
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                // Éxito: El usuario aceptó
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const units = unitsSelect.value;
+                const lang = langSelect.value;
+                
+                // Llamamos a una nueva función para cargar el clima por coordenadas
+                fetchWeatherByCoords(lat, lon, units, lang);
+            },
+            (error) => {
+                // Error: El usuario bloqueó la solicitud o hubo un error
+                console.warn("Geolocalización denegada o fallida.", error.message);
+                // Si falla, el usuario simplemente tendrá que buscar manualmente
+            }
+        );
+    } else {
+        console.log("Geolocalización no está disponible en este navegador.");
+    }
+    // --- FIN DE GEOLOCALIZACIÓN ---
+
 }); // <-- FIN DEL DOMContentLoaded
+
+
 
 
 // --- LÓGICA DE API ---

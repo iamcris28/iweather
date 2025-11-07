@@ -302,7 +302,76 @@ app.delete('/api/favorites', authMiddleware, async (req, res) => {
     }
 });
 
+// (Tu ruta DELETE /api/favorites está aquí arriba...)
 
+// --- ¡NUEVA RUTA PARA GEOLOCALIZACIÓN! ---
+app.get('/api/weather-by-coords', async (req, res) => {
+  try {
+    // 1. Obtenemos lat, lon, units, y lang de la URL
+    const { lat, lon, units = 'metric', lang = 'es' } = req.query;
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+
+    if (!lat || !lon) {
+      return res.status(400).json({ mensaje: "Error: No se proporcionaron coordenadas." });
+    }
+
+    // 2. 🌤️ Datos actuales (Llamada por coordenadas)
+    const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${units}&lang=${lang}`;
+    const currentResponse = await axios.get(currentUrl);
+    const currentData = currentResponse.data;
+    const unitSymbol = units === 'metric' ? 'C' : 'F';
+
+    // 3. 📆 Pronóstico 5 días / 3 horas (Llamada por coordenadas)
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${units}&lang=${lang}`;
+    const forecastResponse = await axios.get(forecastUrl);
+    const forecastList = forecastResponse.data.list;
+
+    // 4. Procesar pronóstico 24 horas (8 entradas)
+    const pronosticoHoras = forecastList.slice(0, 8).map(hour => {
+        const date = new Date(hour.dt * 1000);
+        const hora = `${date.getHours().toString().padStart(2, '0')}h`;
+        return { hora, temp: Math.round(hour.main.temp) };
+    });
+
+    // 5. Procesar pronóstico semanal
+    const pronosticoSemanal = procesarPronosticoSemanal(forecastList, lang);
+
+    // 6. URL del Mapa
+    const mapTileUrl = `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${apiKey}`;
+
+    // 7. 🧩 Clima actual (¡Importante! Añadimos el 'icon' para el fondo dinámico)
+    const weatherData = {
+      ciudad: currentData.name, // Obtenemos el nombre de la ciudad de la API
+      descripcion: currentData.weather[0].description,
+      icono: currentData.weather[0].icon, // <-- ¡NUEVO! Para el fondo dinámico
+      temperatura: Math.round(currentData.main.temp),
+      min_max: `${Math.round(currentData.main.temp_min)}° / ${Math.round(currentData.main.temp_max)}°`,
+      humedad: currentData.main.humidity,
+      presion: currentData.main.pressure,
+      viento: {
+        velocidad: `${Math.round(currentData.wind.speed)} ${(units === 'metric') ? 'km/h' : 'mph'}`,
+        direccion: getWindDirection(currentData.wind.deg)
+      },
+      unit: unitSymbol,
+      coords: { lat: currentData.coord.lat, lon: currentData.coord.lon },
+      mapTileUrl: mapTileUrl
+    };
+    
+    // 8. 📦 Respuesta final
+    res.json({
+      ...weatherData,
+      pronosticoSemanal,
+      pronosticoHoras
+    });
+
+  } catch (error) {
+    console.error("Error al obtener datos del clima por coordenadas:", error.message);
+    res.status(500).json({ mensaje: "Error interno del servidor" });
+  }
+});
+
+// (Aquí abajo sigue tu ruta /api/weather, funciones auxiliares, etc.)
+// ...
 // -------------------------------------------
 // ---          RUTAS DE LA APP            ---
 // -------------------------------------------
