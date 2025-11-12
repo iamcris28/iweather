@@ -21,10 +21,12 @@ app.use(cors());
 app.use(express.json());
 
 // --- Conexión a la Base de Datos ---
+// ¡SINTAXIS CORREGIDA!
 mongoose.connect(process.env.DATABASE_URL)
     .then(() => console.log('✅ Conectado a MongoDB Atlas'))
     .catch((err) => console.error('Error al conectar a MongoDB:', err));
 
+// ¡CORREGIDO! Estas líneas deben ir DESPUÉS de la cadena .then/.catch
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -174,7 +176,7 @@ app.post('/api/auth/google', async (req, res) => {
     }
 });
 
-// --- ¡NUEVA RUTA: SOLICITUD DE RECUPERAR CONTRASEÑA! ---
+// --- RUTA: SOLICITUD DE RECUPERAR CONTRASEÑA ---
 app.post('/api/forgot-password', async (req, res) => {
     try {
         const { email } = req.body;
@@ -197,8 +199,9 @@ app.post('/api/forgot-password', async (req, res) => {
             from: 'goldmaster288pro@gmail.com', // ¡RECUERDA USAR TU EMAIL VERIFICADO!
             subject: 'Restablecimiento de contraseña de iWeather',
             html: `<h1>¿Olvidaste tu contraseña?</h1>
-                   <p>... (tu HTML de email) ...</p>
-                   <a href="${resetUrl}">Restablecer mi contraseña</a>`,
+                   <p>Recibimos una solicitud para restablecer tu contraseña. Haz clic en el siguiente enlace:</p>
+                   <a href="${resetUrl}">Restablecer mi contraseña</a>
+                   <p>Este enlace expirará en 10 minutos.</p>`,
         };
         await sgMail.send(msg);
         res.json({ mensaje: 'Si existe una cuenta con este email, se ha enviado un enlace de recuperación.' });
@@ -209,7 +212,7 @@ app.post('/api/forgot-password', async (req, res) => {
     }
 });
 
-// --- ¡NUEVA RUTA: CONFIRMAR LA NUEVA CONTRASEÑA! ---
+// --- RUTA: CONFIRMAR LA NUEVA CONTRASEÑA ---
 app.post('/api/reset-password', async (req, res) => {
     try {
         const { token, newPassword } = req.body;
@@ -302,76 +305,7 @@ app.delete('/api/favorites', authMiddleware, async (req, res) => {
     }
 });
 
-// (Tu ruta DELETE /api/favorites está aquí arriba...)
 
-// --- ¡NUEVA RUTA PARA GEOLOCALIZACIÓN! ---
-app.get('/api/weather-by-coords', async (req, res) => {
-  try {
-    // 1. Obtenemos lat, lon, units, y lang de la URL
-    const { lat, lon, units = 'metric', lang = 'es' } = req.query;
-    const apiKey = process.env.OPENWEATHER_API_KEY;
-
-    if (!lat || !lon) {
-      return res.status(400).json({ mensaje: "Error: No se proporcionaron coordenadas." });
-    }
-
-    // 2. 🌤️ Datos actuales (Llamada por coordenadas)
-    const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${units}&lang=${lang}`;
-    const currentResponse = await axios.get(currentUrl);
-    const currentData = currentResponse.data;
-    const unitSymbol = units === 'metric' ? 'C' : 'F';
-
-    // 3. 📆 Pronóstico 5 días / 3 horas (Llamada por coordenadas)
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${units}&lang=${lang}`;
-    const forecastResponse = await axios.get(forecastUrl);
-    const forecastList = forecastResponse.data.list;
-
-    // 4. Procesar pronóstico 24 horas (8 entradas)
-    const pronosticoHoras = forecastList.slice(0, 8).map(hour => {
-        const date = new Date(hour.dt * 1000);
-        const hora = `${date.getHours().toString().padStart(2, '0')}h`;
-        return { hora, temp: Math.round(hour.main.temp) };
-    });
-
-    // 5. Procesar pronóstico semanal
-    const pronosticoSemanal = procesarPronosticoSemanal(forecastList, lang);
-
-    // 6. URL del Mapa
-    const mapTileUrl = `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${apiKey}`;
-
-    // 7. 🧩 Clima actual (¡Importante! Añadimos el 'icon' para el fondo dinámico)
-    const weatherData = {
-      ciudad: currentData.name, // Obtenemos el nombre de la ciudad de la API
-      descripcion: currentData.weather[0].description,
-      icono: currentData.weather[0].icon, // <-- ¡NUEVO! Para el fondo dinámico
-      temperatura: Math.round(currentData.main.temp),
-      min_max: `${Math.round(currentData.main.temp_min)}° / ${Math.round(currentData.main.temp_max)}°`,
-      humedad: currentData.main.humidity,
-      presion: currentData.main.pressure,
-      viento: {
-        velocidad: `${Math.round(currentData.wind.speed)} ${(units === 'metric') ? 'km/h' : 'mph'}`,
-        direccion: getWindDirection(currentData.wind.deg)
-      },
-      unit: unitSymbol,
-      coords: { lat: currentData.coord.lat, lon: currentData.coord.lon },
-      mapTileUrl: mapTileUrl
-    };
-    
-    // 8. 📦 Respuesta final
-    res.json({
-      ...weatherData,
-      pronosticoSemanal,
-      pronosticoHoras
-    });
-
-  } catch (error) {
-    console.error("Error al obtener datos del clima por coordenadas:", error.message);
-    res.status(500).json({ mensaje: "Error interno del servidor" });
-  }
-});
-
-// (Aquí abajo sigue tu ruta /api/weather, funciones auxiliares, etc.)
-// ...
 // -------------------------------------------
 // ---          RUTAS DE LA APP            ---
 // -------------------------------------------
@@ -395,9 +329,10 @@ app.get('/api/weather-by-coords', async (req, res) => {
     const currentResponse = await axios.get(currentUrl);
     const currentData = currentResponse.data;
     const unitSymbol = units === 'metric' ? 'C' : 'F';
+    const { lat: resLat, lon: resLon } = currentData.coord; // Renombrar para evitar conflicto
 
     // 2. Pronóstico
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${units}&lang=${lang}`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${resLat}&lon=${resLon}&appid=${apiKey}&units=${units}&lang=${lang}`;
     const forecastResponse = await axios.get(forecastUrl);
     const forecastList = forecastResponse.data.list;
 
@@ -418,6 +353,7 @@ app.get('/api/weather-by-coords', async (req, res) => {
     const weatherData = {
       ciudad: currentData.name,
       descripcion: currentData.weather[0].description,
+      icono: currentData.weather[0].icon,
       temperatura: Math.round(currentData.main.temp),
       min_max: `${Math.round(currentData.main.temp_min)}° / ${Math.round(currentData.main.temp_max)}°`,
       humedad: currentData.main.humidity,
@@ -427,7 +363,7 @@ app.get('/api/weather-by-coords', async (req, res) => {
         direccion: getWindDirection(currentData.wind.deg)
       },
       unit: unitSymbol,
-      coords: { lat: currentData.coord.lat, lon: currentData.coord.lon },
+      coords: { lat: resLat, lon: resLon },
       mapTileUrl: mapTileUrl
     };
     
@@ -442,7 +378,7 @@ app.get('/api/weather-by-coords', async (req, res) => {
     console.error("Error al obtener datos del clima por coordenadas:", error.message);
     res.status(500).json({ mensaje: "Error interno del servidor" });
   }
-}); // <-- ¡¡AQUÍ FALTABA EL CIERRE DE ESTA RUTA!!
+});
 
 // --- RUTA DE CLIMA POR NOMBRE (La principal) ---
 app.get('/api/weather', async (req, res) => {
@@ -483,6 +419,7 @@ app.get('/api/weather', async (req, res) => {
     const weatherData = {
       ciudad: currentData.name,
       descripcion: currentData.weather[0].description,
+      icono: currentData.weather[0].icon,
       temperatura: Math.round(currentData.main.temp),
       min_max: `${Math.round(currentData.main.temp_min)}° / ${Math.round(currentData.main.temp_max)}°`,
       humedad: currentData.main.humidity,
@@ -554,7 +491,8 @@ function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// ¡AQUÍ FALTABA ESTA FUNCIÓN!
+// (Ya no usamos UV, así que la función getUVLevel() se puede borrar,
+// pero la dejaré por si acaso, no hace daño)
 function getUVLevel(uvi) {
   if (uvi < 3) return 'Bajo';
   if (uvi < 6) return 'Moderado';
