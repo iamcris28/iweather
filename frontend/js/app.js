@@ -454,6 +454,12 @@ function updateDynamicBackground(data) {
     const body = document.body;
     const player = document.getElementById('weather-animation-player');
     
+    // Esto fuerza a la animación a comportarse como "background-size: cover"
+    // 'slice' corta lo que sobra para que no queden bordes vacíos.
+    if (player) {
+        player.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    }
+    // ------------------------
     // Obtenemos todos los datos que necesitamos
     const iconCode = data.icono;
     const description = data.descripcion.toLowerCase(); // ¡NUEVO! Convertimos a minúsculas
