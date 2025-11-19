@@ -219,7 +219,7 @@ function fetchWeather(city, units, lang) {
             // --- ¡AQUÍ ESTÁ EL ARREGLO! ---
             // Esta línea faltaba y causaba que el fondo no se actualizara
             // en la búsqueda manual.
-            if (data.icono) updateDynamicBackground(data.icono); 
+         if (data.icono) updateDynamicBackground(data);
         })
         .catch(error => {
             // 4. Falla: Muestra el error
@@ -259,7 +259,7 @@ function fetchWeatherByCoords(lat, lon, units, lang) {
             if (data.pronosticoSemanal) updateWeeklyForecast(data.pronosticoSemanal);
             if (data.pronosticoHoras) updateHourlyForecast(data.pronosticoHoras);
             if (data.coords && data.mapTileUrl) updateMap(data.coords, data.mapTileUrl);
-            if (data.icono) updateDynamicBackground(data.icono);
+            if (data.icono) updateDynamicBackground(data);
         })
         .catch(error => {
             // 4. Falla: Muestra el error
@@ -447,36 +447,91 @@ function updateMap(coords, mapTileUrl) {
 }
 
 /**
- * Actualiza el fondo de la página basado en el código de ícono del clima.
+ * Actualiza el fondo de la página Y carga la animación Lottie
+ * basada en el código de ícono Y LA DESCRIPCIÓN del clima.
  */
-function updateDynamicBackground(iconCode) {
+function updateDynamicBackground(data) {
     const body = document.body;
-    let newClass = 'bg-default'; 
-    const classes = ['bg-default', 'bg-day-clear', 'bg-night-clear', 
-                     'bg-day-clouds', 'bg-night-clouds', 'bg-rain-storm', 
-                     'bg-snow', 'bg-mist'];
+    const player = document.getElementById('weather-animation-player');
     
-    switch (iconCode) {
-        case '01d': newClass = 'bg-day-clear'; break;
-        case '01n': newClass = 'bg-night-clear'; break;
-        case '02d':
-        case '03d':
-        case '04d': newClass = 'bg-day-clouds'; break;
-        case '02n':
-        case '03n':
-        case '04n': newClass = 'bg-night-clouds'; break;
-        case '09d':
-        case '10d':
-        case '11d':
-        case '09n':
-        case '10n':
-        case '11n': newClass = 'bg-rain-storm'; break;
-        case '13d':
-        case '13n': newClass = 'bg-snow'; break;
-        case '50d':
-        case '50n': newClass = 'bg-mist'; break;
+    // Obtenemos todos los datos que necesitamos
+    const iconCode = data.icono;
+    const description = data.descripcion.toLowerCase(); // ¡NUEVO! Convertimos a minúsculas
+
+    let newBodyClass = 'bg-default';
+    let animationFile = '';
+
+    // Clases de fondo del body
+    const bodyClasses = ['bg-default', 'bg-day-clear', 'bg-night-clear',
+                        'bg-day-clouds', 'bg-night-clouds', 'bg-rain-storm',
+                        'bg-snow', 'bg-mist'];
+
+    // --- ¡NUEVA LÓGICA DE PRIORIDAD! ---
+    // 1. Prioridad: Nieve. Si la descripción dice "nieve" o el ícono es 13, ES NIEVE.
+    if (description.includes('nieve') || description.includes('snow') || iconCode === '13d' || iconCode === '13n') {
+        newBodyClass = 'bg-snow';
+        animationFile = 'animations/snow.json';
+    
+    // 2. Prioridad: Tormenta.
+    } else if (description.includes('tormenta') || description.includes('storm') || iconCode === '11d' || iconCode === '11n') {
+        newBodyClass = 'bg-rain-storm';
+        animationFile = 'animations/storm.json';
+
+    // 3. Prioridad: Lluvia.
+    } else if (description.includes('lluvia') || description.includes('rain') || description.includes('llovizna') || iconCode === '09d' || iconCode === '09n' || iconCode === '10d' || iconCode === '10n') {
+        newBodyClass = 'bg-rain-storm';
+        animationFile = 'animations/rainy.json';
+    
+    // 4. Prioridad: Niebla.
+    } else if (description.includes('niebla') || description.includes('mist') || description.includes('fog') || iconCode === '50d' || iconCode === '50n') {
+        newBodyClass = 'bg-mist';
+        animationFile = 'animations/mist.json';
+
+    // 5. Fallback: Si no es nada de lo anterior, usamos el ícono para Sol o Nubes.
+    } else {
+        switch (iconCode) {
+            case '01d': // Despejado día
+                newBodyClass = 'bg-day-clear';
+                animationFile = 'animations/sunny.json';
+                break;
+            case '01n': // Despejado noche
+                newBodyClass = 'bg-night-clear';
+                animationFile = 'animations/moon.json';
+                break;
+            case '02d': // Nubes día
+            case '03d':
+            case '04d':
+                newBodyClass = 'bg-day-clouds';
+                animationFile = 'animations/cloudy.json';
+                break;
+            case '02n': // Nubes noche
+            case '03n':
+            case '04n':
+                newBodyClass = 'bg-night-clouds';
+                animationFile = 'animations/cloudy-night.json';
+                break;
+            default:
+                // Si todo falla, usa nubes de día como defecto
+                newBodyClass = 'bg-day-clouds';
+                animationFile = 'animations/cloudy.json';
+        }
     }
-    
-    body.classList.remove(...classes);
-    body.classList.add(newClass);
+
+    // 1. Actualiza las clases del Body para el fondo de gradiente
+    body.classList.remove(...bodyClasses);
+    body.classList.add(newBodyClass);
+
+    // 2. Carga la nueva animación en el reproductor Lottie
+    if (animationFile && player) {
+        // Obtenemos la URL base (en caso de que estemos en http://127.0.0.1:5500/frontend/)
+        const baseUrl = window.location.href.replace('index.html', '');
+        const animationUrl = new URL(animationFile, baseUrl).href;
+
+        // Comparamos la URL completa para evitar recargar la misma animación
+        if (player.src !== animationUrl) {
+            player.load(animationUrl);
+        }
+    } else if (player) {
+        player.load(''); // Carga una animación vacía si no hay ninguna
+    }
 }

@@ -86,44 +86,103 @@ body {
 .delete-fav-btn { background: #ff4d4d; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 14px; font-weight: bold; cursor: pointer; padding: 0; line-height: 20px; text-align: center; opacity: 0.7; transition: opacity 0.3s ease; }
 .delete-fav-btn:hover { opacity: 1; }
 
-/* --- 10. FONDOS DINÁMICOS (¡Colores mejorados!) --- */
+/* --- 10. FONDOS DINÁMICOS (CON ANIMACIONES) --- */
 
-/* Default (tu azul original) */
+/* Keyframes (las animaciones en sí) */
+@keyframes sunny-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes night-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes cloudy-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes rainy-animation {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 20% 100%; }
+}
+
+@keyframes mist-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+/* Clases que se aplican al <body> */
+
+/* Fondo por defecto (el que ya tenías) */
 .bg-default {
   background: linear-gradient(rgba(14, 175, 239, 1), rgba(10, 52, 119, 1));
 }
 
-/* Día - Despejado (01d) - ¡Azul Claro! */
+/* Día Despejado */
 .bg-day-clear {
-  background: linear-gradient(to top, #87CEEB, #E0F2F7); /* De Azul Cielo a casi blanco */
+  background: linear-gradient(45deg, #FFC700, #FF7A00, #00AFFF, #007FFF);
+  background-size: 400% 400%;
+  animation: sunny-animation 20s ease infinite;
 }
 
-/* Noche - Despejado (01n) */
+/* Noche Despejada */
 .bg-night-clear {
-  background: linear-gradient(to top, #0d1b2a, #1b263b); /* Noche azul oscura */
+  background: linear-gradient(45deg, #020111, #19163a, #3c3b6e, #19163a);
+  background-size: 400% 400%;
+  animation: night-animation 30s ease infinite;
 }
 
-/* Día - Nubes (02d, 03d, 04d) - ¡Más claro y azulado! */
+/* Día Nublado */
 .bg-day-clouds {
-  background: linear-gradient(to top, #B0C4DE, #E6E9F0); /* De Azul Acero a gris claro */
+  background: linear-gradient(60deg, #B0C4DE, #87CEEB, #708090, #B0C4DE);
+  background-size: 400% 400%;
+  animation: cloudy-animation 40s ease infinite;
 }
 
-/* Noche - Nubes (02n, 03n, 04n) */
+/* Noche Nublada */
 .bg-night-clouds {
-  background: linear-gradient(to top, #3a506b, #5c6b73); /* Noche nublada más clara */
+  background: linear-gradient(60deg, #464B52, #2c3e50, #34495e, #464B52);
+  background-size: 400% 400%;
+  animation: cloudy-animation 45s ease infinite;
 }
 
-/* Lluvia/Tormenta (09d, 10d, 11d, 09n, 10n, 11n) - ¡Gris claro! */
+/* Lluvia / Tormenta */
 .bg-rain-storm {
-  background: linear-gradient(to top, #6c757d, #adb5bd);
+  background: linear-gradient(120deg, #778899, #4A5F70, #2c3e50, #778899);
+  background-size: 200% 200%;
+  animation: rainy-animation 15s linear infinite;
 }
 
-/* Nieve (13d, 13n) */
+/* Nieve */
 .bg-snow {
-  background: linear-gradient(to top, #e6dada, #f7f7f7);
+  background: linear-gradient(45deg, #E6E6FA, #B0E0E6, #FFFFFF, #B0E0E6);
+  background-size: 400% 400%;
+  animation: cloudy-animation 25s ease infinite;
 }
 
-/* Niebla (50d, 50n) */
+/* Niebla */
 .bg-mist {
-  background: linear-gradient(to top, #bdc3c7, #e0e0e0);
+   background: linear-gradient(45deg, #D3D3D3, #A9A9A9, #D3D3D3, #C0C0C0);
+   background-size: 400% 400%;
+   animation: mist-animation 30s ease infinite;
+}
+
+/* --- 11. REPRODUCTOR LOTTIE --- */
+#weather-animation-player {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Permite hacer clic "a través" de la animación */
+    z-index: 0; /* Lo pone detrás del contenido pero encima del fondo */
+    opacity: 0.7; /* Le da una transparencia sutil */
 }

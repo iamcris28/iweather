@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iWeather - App del Clima</title>
     <link href="css/main.css" rel="stylesheet" />
@@ -13,6 +14,21 @@
     <script src="js/app.js" defer></script>
 </head>
 <body>
+    
+    <lottie-player 
+        id="weather-animation-player"
+        autoplay
+        loop
+        mode="normal"
+        src="" 
+    ></lottie-player>
+
+    <div id="css-visual-effects">
+        <div class="visual rainy"></div>
+        <div class="visual stormy"></div>
+        <div class="visual snowy"></div>
+        <div class="visual mist"></div>
+    </div>
 
     <div class="main-container">
         
