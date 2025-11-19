@@ -524,8 +524,8 @@ function updateDynamicBackground(data) {
     // 2. Carga la nueva animación en el reproductor Lottie
     if (animationFile && player) {
         // Obtenemos la URL base (en caso de que estemos en http://127.0.0.1:5500/frontend/)
-        //const baseUrl = window.location.href.replace('index.html', '');
-        //const animationUrl = new URL(animationFile, baseUrl).href;
+        const baseUrl = window.location.href.replace('index.html', '');
+        const animationUrl = new URL(animationFile, baseUrl).href;
 
         // Comparamos la URL completa para evitar recargar la misma animación
         if (player.src !== animationUrl) {
