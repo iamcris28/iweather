@@ -5,6 +5,7 @@
 html {
   height: 100%; /* Asegura que la raíz HTML ocupe el 100% */
 }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Istok Web', sans-serif;
