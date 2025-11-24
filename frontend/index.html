@@ -23,18 +23,20 @@
         src="" 
     ></lottie-player>
 
+   
 
     <div class="main-container">
         
         <div class="header-bar">
-            <div class="logo">
-                <img src="images/v115_2.png" alt="iWeather Logo">
-            </div>
-
+        
+        <div class="logo">
+            <img src="images/logo.png" alt="iWeather Logo">
+        </div>
             <div class="search-container">
-                <input type="text" id="city-input" placeholder="Escribe una ciudad..." />
+                <input type="text" id="city-input" placeholder="Escribe una ciudad..." list="city-suggestions" autocomplete="off" />
                 <button id="search-button">Buscar</button>
                 <button id="save-favorite-button" style="display: none;">Guardar ⭐</button>
+                <datalist id="city-suggestions"></datalist>
             </div>
 
             <a href="login.html" class="login-link" id="login-link">Login / Registro</a>
@@ -90,6 +92,12 @@
                         <h4>Viento</h4>
                         <img src="images/v31_32.png" alt="Viento">
                         <p id="wind">---<br><span>---</span></p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Índice UV</h4> <div class="uv-container">
+                         <span id="uv-value" class="uv-value">--</span>
+                        <span id="uv-label" class="uv-label">...</span>
+                    </div>
                     </div>
                 </div>
             </div>

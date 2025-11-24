@@ -215,6 +215,9 @@ function fetchWeather(city, units, lang) {
             if (data.pronosticoSemanal) updateWeeklyForecast(data.pronosticoSemanal);
             if (data.pronosticoHoras) updateHourlyForecast(data.pronosticoHoras);
             if (data.coords && data.mapTileUrl) updateMap(data.coords, data.mapTileUrl);
+            if (data.coords) {
+            fetchUV(data.coords.lat, data.coords.lon);
+            }
             
             // --- ¡AQUÍ ESTÁ EL ARREGLO! ---
             // Esta línea faltaba y causaba que el fondo no se actualizara
@@ -260,6 +263,7 @@ function fetchWeatherByCoords(lat, lon, units, lang) {
             if (data.pronosticoHoras) updateHourlyForecast(data.pronosticoHoras);
             if (data.coords && data.mapTileUrl) updateMap(data.coords, data.mapTileUrl);
             if (data.icono) updateDynamicBackground(data);
+            fetchUV(lat, lon);
         })
         .catch(error => {
             // 4. Falla: Muestra el error
@@ -540,4 +544,94 @@ function updateDynamicBackground(data) {
     } else if (player) {
         player.load(''); // Carga una animación vacía si no hay ninguna
     }
+}
+
+// --- FUNCIÓN PARA OBTENER UV (Open-Meteo API) ---
+function fetchUV(lat, lon) {
+    // URL de la API gratuita (solo pide el índice UV actual)
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=uv_index&timezone=auto`;
+
+    fetch(url)
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.current) {
+                updateUVCard(data.current.uv_index);
+            }
+        })
+        .catch(err => console.error("Error UV:", err));
+}
+
+function updateUVCard(uvIndex) {
+    const uvValue = document.getElementById('uv-value');
+    const uvLabel = document.getElementById('uv-label');
+
+    // Mostrar valor
+    uvValue.innerText = uvIndex;
+
+    // Determinar color y texto según riesgo
+    let texto = "Bajo";
+    let color = "#55efc4"; // Verde
+
+    if (uvIndex >= 3 && uvIndex < 6) {
+        texto = "Moderado";
+        color = "#ffeaa7"; // Amarillo
+    } else if (uvIndex >= 6 && uvIndex < 8) {
+        texto = "Alto";
+        color = "#fdcb6e"; // Naranja
+    } else if (uvIndex >= 8 && uvIndex < 11) {
+        texto = "Muy Alto";
+        color = "#ff7675"; // Rojo
+    } else if (uvIndex >= 11) {
+        texto = "Extremo";
+        color = "#d63031"; // Rojo oscuro/Violeta
+    }
+
+    uvLabel.innerText = texto;
+    uvLabel.style.color = color;
+}
+
+/* =========================================
+   --- AUTOCOMPLETADO DE CIUDADES (Open-Meteo) ---
+   ========================================= */
+
+const cityInput = document.getElementById('city-input');
+const suggestionsList = document.getElementById('city-suggestions');
+let debounceTimer; // Para no llamar a la API con cada tecla, esperamos un poco
+
+if (cityInput) {
+    cityInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+
+        // Solo buscar si hay más de 2 letras
+        if (value.length < 3) return;
+
+        // Limpiamos el timer anterior si el usuario sigue escribiendo
+        clearTimeout(debounceTimer);
+
+        // Esperamos 300ms antes de hacer la petición (para no saturar)
+        debounceTimer = setTimeout(() => {
+            fetchCitySuggestions(value);
+        }, 300);
+    });
+}
+
+function fetchCitySuggestions(query) {
+    // API gratuita de Geocodificación de Open-Meteo
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=5&language=es&format=json`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            suggestionsList.innerHTML = ''; // Limpiar sugerencias anteriores
+
+            if (data.results) {
+                data.results.forEach(city => {
+                    const option = document.createElement('option');
+                    // Mostramos: "Madrid, España" o "Paris, Francia"
+                    option.value = `${city.name}, ${city.country}`; 
+                    suggestionsList.appendChild(option);
+                });
+            }
+        })
+        .catch(err => console.error("Error buscando ciudades:", err));
 }
