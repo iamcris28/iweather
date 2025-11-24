@@ -13,6 +13,7 @@ const API_URL = 'https://iweather.onrender.com';
 let currentCity = '';
 let currentChart = null;
 let currentMap = null;
+let suggestionsMap = {}; // Aquí guardaremos las coordenadas de las sugerencias
 
 
 /*
@@ -132,17 +133,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const unitsSelect = document.getElementById('units-select');
     const langSelect = document.getElementById('lang-select');
 
-    window.handleSearch = function() {
-        const city = cityInput.value;
+   window.handleSearch = function() {
+        const inputValue = cityInput.value; // Lo que escribió el usuario
         const units = unitsSelect.value;
         const lang = langSelect.value;
-        if (city.trim() === '') {
+
+        if (inputValue.trim() === '') {
             alert('Por favor, escribe el nombre de una ciudad.');
             return;
         }
-        fetchWeather(city, units, lang);
-    }
 
+        // 1. ¿El texto coincide exactamente con una sugerencia que tenemos guardada?
+        if (suggestionsMap[inputValue]) {
+            // ¡SÍ! Tenemos coordenadas exactas. Usamos la ruta de coordenadas.
+            const coords = suggestionsMap[inputValue];
+            console.log("Usando coordenadas exactas:", coords);
+            fetchWeatherByCoords(coords.lat, coords.lon, units, lang);
+        } else {
+            // 2. NO. Es una búsqueda manual (el usuario escribió y dio Enter sin seleccionar).
+            // Usamos la búsqueda tradicional por nombre.
+            fetchWeather(inputValue, units, lang);
+        }
+    }
     function handleSettingsChange() {
         if (!currentCity) return;
         const units = unitsSelect.value;
@@ -596,40 +608,58 @@ function updateUVCard(uvIndex) {
 
 const cityInput = document.getElementById('city-input');
 const suggestionsList = document.getElementById('city-suggestions');
-let debounceTimer; // Para no llamar a la API con cada tecla, esperamos un poco
+let debounceTimer; 
 
+// --- CAMBIO IMPORTANTE AQUÍ ---
 if (cityInput) {
     cityInput.addEventListener('input', (e) => {
         const value = e.target.value;
 
-        // Solo buscar si hay más de 2 letras
+        // 1. TRUCO DE SEGURIDAD:
+        // Si lo que hay en el input YA coincide exactamente con una de nuestras sugerencias guardadas,
+        // significa que el usuario acaba de seleccionar una opción.
+        // ¡NO hacemos nada! Así conservamos las coordenadas correctas en suggestionsMap.
+        if (suggestionsMap[value]) {
+            return; 
+        }
+
+        // 2. Si es texto nuevo, seguimos con la búsqueda normal...
         if (value.length < 3) return;
 
-        // Limpiamos el timer anterior si el usuario sigue escribiendo
         clearTimeout(debounceTimer);
-
-        // Esperamos 300ms antes de hacer la petición (para no saturar)
         debounceTimer = setTimeout(() => {
             fetchCitySuggestions(value);
         }, 300);
     });
 }
-
 function fetchCitySuggestions(query) {
-    // API gratuita de Geocodificación de Open-Meteo
+    // API de geocodificación de Open-Meteo
     const url = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=5&language=es&format=json`;
 
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            suggestionsList.innerHTML = ''; // Limpiar sugerencias anteriores
+            suggestionsList.innerHTML = '';
+            suggestionsMap = {}; // Limpiamos el mapa anterior
 
             if (data.results) {
                 data.results.forEach(city => {
                     const option = document.createElement('option');
-                    // Mostramos: "Madrid, España" o "Paris, Francia"
-                    option.value = `${city.name}, ${city.country}`; 
+                    
+                    // Creamos un nombre único: "Veracruz, México" o "Veracruz, Panamá"
+                    // Si hay 'admin1' (estado/provincia), lo agregamos para ser más exactos
+                    let displayName = `${city.name}, ${city.country}`;
+                    if (city.admin1) displayName += ` (${city.admin1})`;
+
+                    option.value = displayName; 
                     suggestionsList.appendChild(option);
+
+                    // --- AQUÍ ESTÁ EL TRUCO ---
+                    // Guardamos las coordenadas asociadas a este nombre exacto
+                    suggestionsMap[displayName] = { 
+                        lat: city.latitude, 
+                        lon: city.longitude 
+                    };
                 });
             }
         })
