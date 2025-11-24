@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     saveFavoriteButton.addEventListener('click', async () => {
         if (!currentCity || !token) {
-            alert('Debes estar logueado y buscar una ciudad para guardarla.');
+            showNotification('Debes estar logueado y buscar una ciudad para guardarla.', 'error');
             return;
         }
         try {
@@ -106,11 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.mensaje || 'Error al guardar');
-            alert('¡Ciudad guardada en favoritos!');
+            showNotification('Ciudad guardada', 'success');
             updateFavoritesUI(data.favorites); 
         } catch (error) {
             console.error('Error al guardar:', error);
-            alert(`Error: ${error.message}`);
+            showNotification(`Error: ${error.message}`, 'error');
         }
     });
     
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const lang = langSelect.value;
 
         if (inputValue.trim() === '') {
-            alert('Por favor, escribe el nombre de una ciudad.');
+            showNotification('Por favor, escribe el nombre de una ciudad.', 'error');
             return;
         }
 
@@ -182,10 +182,13 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             (error) => {
                 console.warn("Geolocalización denegada o fallida.", error.message);
+                fetchWeather("Mexico City", "metric", "es"); // Ciudad por defecto
+            showNotification("Mostrando clima por defecto", "info");
             }
         );
     } else {
-        console.log("Geolocalización no está disponible en este navegador.");
+       // Si el navegador no tiene geo
+    fetchWeather("Mexico City", "metric", "es"); // Ciudad por defecto
     }
     // --- FIN DE GEOLOCALIZACIÓN ---
 
@@ -203,6 +206,14 @@ document.addEventListener('DOMContentLoaded', () => {
  * Llama a la ruta /api/weather del backend.
  */
 function fetchWeather(city, units, lang) {
+   // 1. Referencia al botón
+    const btn = document.getElementById('search-button');
+    
+    // 2. Poner botón en modo "Cargando"
+    if (btn) {
+        btn.textContent = "⌛"; // O "Cargando..."
+        btn.disabled = true;    // Evita doble clic
+    }
     // 1. Pone la UI en modo "Cargando..."
     document.getElementById('city-name').innerText = 'Buscando...';
     document.getElementById('current-description').innerText = '---';
@@ -235,6 +246,9 @@ function fetchWeather(city, units, lang) {
             // Esta línea faltaba y causaba que el fondo no se actualizara
             // en la búsqueda manual.
          if (data.icono) updateDynamicBackground(data);
+
+         // Notificación de éxito (opcional si usaste Toastify)
+            showNotification('Clima actualizado', 'success');
         })
         .catch(error => {
             // 4. Falla: Muestra el error
@@ -242,6 +256,21 @@ function fetchWeather(city, units, lang) {
             document.getElementById('city-name').innerText = 'Error';
             document.getElementById('current-description').innerText = 'Ciudad no encontrada.';
             currentCity = '';
+
+           // Notificación de error (si usaste Toastify)
+            if (typeof showNotification === 'function') {
+                showNotification('No se encontró la ciudad', 'error');
+            } else {
+                alert('No se encontró la ciudad');
+            }
+        })
+        .finally(() => {
+            // --- ¡ESTA ES LA PARTE IMPORTANTE! ---
+            // .finally() se ejecuta SIEMPRE, haya éxito o error.
+            if (btn) {
+                btn.textContent = "Buscar";
+                btn.disabled = false; // Reactivamos el botón
+            }
         });
 }
 
@@ -347,7 +376,7 @@ function updateFavoritesUI(favorites) {
 async function handleDeleteFavorite(cityName) {
     const token = localStorage.getItem('token');
     if (!token) {
-        alert('Debes iniciar sesión.');
+        showNotification('Debes iniciar sesión.', 'error');
         return;
     }
     if (!confirm(`¿Estás seguro de que quieres eliminar "${cityName}" de tus favoritos?`)) {
@@ -365,11 +394,11 @@ async function handleDeleteFavorite(cityName) {
         const data = await response.json();
         if (!response.ok) throw new Error(data.mensaje || 'Error al eliminar');
         
-        alert('Favorito eliminado');
+        showNotification('Favorito eliminado', 'success');
         updateFavoritesUI(data.favorites); // Actualiza la lista
     } catch (error) {
         console.error('Error al eliminar:', error);
-        alert(`Error: ${error.message}`);
+        showNotification(`Error: ${error.message}`, 'error');
     }
 }
 
@@ -664,4 +693,15 @@ function fetchCitySuggestions(query) {
             }
         })
         .catch(err => console.error("Error buscando ciudades:", err));
+}
+
+function showNotification(text, type = "error") {
+    const color = type === "success" ? "#00b894" : "#d63031"; // Verde o Rojo
+    Toastify({
+        text: text,
+        duration: 3000,
+        gravity: "top", 
+        position: "center", 
+        style: { background: color, borderRadius: "10px" }
+    }).showToast();
 }
